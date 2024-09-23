@@ -3,17 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 import bookingIMG from "@/public/assets/images/bookingImg.jpg"
 import logoIMG from "@/public/assets/images/mediCareLogo.png"
-import PasskeyModal from "@/components/PasskeyModal";
+import AppointmentForm from "@/components/forms/AppointmentForm";
+import { getPatient } from "@/lib/actions/patient.actions";
 
-export default function Home({ searchParams }: SearchParamProps) {
-  const isAdmin = searchParams.admin === 'true';
+import * as Sentry from '@sentry/nextjs'
 
+export default async function NewAppointment({ params: { userId }}: SearchParamProps) {
+  const patient = await getPatient(userId);
+
+  Sentry.metrics.set("user_view_new-appointment", patient.name);
+  
   return (
     <div className="flex h-screen max-h-screen">
-      {isAdmin && <PasskeyModal/>}
-      
       <section className="remove-scrollbar container my-auto">
-        <div className="sub-container max-w-[496px]">
+        <div className="sub-container max-w-[860px] flex-1 justify-between">
         {/* <Image
           src="/assets/icons/logo-full.svg"
           // src={logoIMG}
@@ -37,26 +40,25 @@ export default function Home({ searchParams }: SearchParamProps) {
         </div>
 
 
-          <PatientForm/>
+          <AppointmentForm 
+          type="create"
+           userId={userId}
+           patientId={patient.$id}
+          />
 
-          <div className="text-14-regular mt-20 flex justify-between">
-          <p className="justify-items-end text-dark-600 xl:text-left">
+          <p className="copyright mt-10 py-12">
           ©Developed by Ritesh Raj Tiwari
           </p>
-          <Link href="/?admin=true" className="text-green-500">
-          Admin
-          </Link>
-          </div>
         </div>
       </section>
 
       <Image
-        // src="/assets/images/onboarding-img.png"
-        src={bookingIMG}
+        src="/assets/images/appointment-img.png"
+        // src={bookingIMG}
         height={1000}
         width={1000}
-        alt="patient"
-        className="side-img max-w-[50%] border-rounded"
+        alt="appointment"
+        className="side-img max-w-[390px] bg-bottom"
         />
     </div>
   );
